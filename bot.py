@@ -1,34 +1,17 @@
-import logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+import telebot
 
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+# Replace 'YOUR_BOT_TOKEN' with your actual bot token
+API_TOKEN = 'YOUR_BOT_TOKEN'
+bot = telebot.TeleBot(API_TOKEN)
 
-# Create logger
-logger = logging.getLogger(__name__)
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Welcome to the bot! How can I assist you today?")
 
-# Command handler for /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handler function for the /start command"""
-    user = update.effective_user
-    welcome_message = f"Xin chào {user.first_name}! 👋\nTôi là bot test. Rất vui được gặp bạn!"
-    await update.message.reply_text(welcome_message)
-
-def main() -> None:
-    """Start the bot"""
-    # Replace 'YOUR_BOT_TOKEN' with your actual bot token from BotFather
-    app = Application.builder().token('YOUR_BOT_TOKEN').build()
-
-    # Add command handlers
-    app.add_handler(CommandHandler("start", start))
-
-    # Start the bot
-    print("Bot đang chạy...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+@bot.message_handler(func=lambda message: True)
+def echo_message(message):
+    bot.reply_to(message, "You said: " + message.text)
 
 if __name__ == '__main__':
-    main()
+    print("Bot is polling...")
+    bot.polling(none_stop=True)
